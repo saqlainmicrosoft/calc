@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Date & Revenue Calculator</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            gap: 122px;
+            width: 900%;
+            max-width: 9000px;
+            justify-content: center;
+        }
+
+        /* Individual Box Styling */
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Headings */
+        h2 {
+            color: #8fc31f;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        /* Input Fields */
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input {
+            width: 94%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        input:focus {
+            border-color: #8fc31f;
+            box-shadow: 0 0 10px rgba(143, 195, 31, 0.3);
+        }
+
+        /* Plus Button */
+        .plus-button {
+            background-color: #d11a6a;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease-in-out; /* Removed transform */
+        }
+
+        .plus-button:hover {
+            background-color: #e34d8f;
+        }
+
+        /* Buttons */
+        button {
+            background-color: #8fc31f;  
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background 0.3s ease-in-out; /* Removed transform */
+        }
+
+        button:hover {
+            background-color: #abd94a;
+        }
+
+        /* Results */
+        .result {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        /* ✅ Updated Colors */
+        #prepaidResult { color: #8fc31f; }   /* ✅ Green like "Revenue with tax" */
+        #mbbResult { color: #ff007f; }       /* ✅ Pink like "Revenue without tax" */
+        #resultWithTax { color: #8fc31f; }   /* ✅ Green */
+        #resultWithoutTax { color: #ff007f; } /* ✅ Pink */
+
+        /* Responsive Design */
+        @media (max-width: 850px) {
+            .main-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Open Date Calculator -->
+        <div class="container">
+            <h2>Open Date Calculator</h2>
+            <input type="date" id="selectedDate">
+            <button onclick="calculateOpenDates()">Calculate Open Dates</button>
+            <div class="result" id="prepaidResult">Prepaid Open Date: -</div>
+            <div class="result" id="mbbResult">MBB Open Date: -</div>
+        </div>
+
+        <!-- Tax Calculator -->
+        <div class="container">
+            <h2>Revenue Calculator</h2>
+            <div class="input-group">
+                <input type="text" id="RevenueInput" placeholder="Enter Revenue (e.g. 10000 or 10000+5000)">
+                <button class="plus-button" onclick="addPlus()">+</button>
+            </div>
+            <button onclick="calculateTax()">Calculate</button>
+            <div class="result" id="resultWithTax">Revenue with tax: -</div>
+            <div class="result" id="resultWithoutTax">Revenue without tax: -</div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function calculateTax() {
+            let input = document.getElementById('RevenueInput').value;
+            
+            if (input.trim() !== "") {
+                let sum = input.replace(/\s+/g, '').split('+').reduce((acc, num) => acc + parseFloat(num || 0), 0);
+                
+                if (!isNaN(sum) && sum > 0) {
+                    let RevenueWithTax = formatNumber(sum.toFixed(2));
+                    let RevenueWithoutTax = formatNumber((sum / 1.195).toFixed(2));
+
+                    document.getElementById('resultWithTax').innerText = "Revenue with tax: " + RevenueWithTax;
+                    document.getElementById('resultWithoutTax').innerText = "Revenue without tax: " + RevenueWithoutTax;
+                } else {
+                    document.getElementById('resultWithTax').innerText = "Invalid input. Please enter numbers.";
+                    document.getElementById('resultWithoutTax').innerText = "";
+                }
+            } else {
+                document.getElementById('resultWithTax').innerText = "Revenue with tax: -";
+                document.getElementById('resultWithoutTax').innerText = "Revenue without tax: -";
+            }
+        }
+
+        function calculateOpenDates() {
+            let selectedDate = document.getElementById('selectedDate').value;
+            if (!selectedDate) {
+                document.getElementById('prepaidResult').innerText = "Please select a date.";
+                document.getElementById('mbbResult').innerText = "";
+                return;
+            }
+
+            let date = new Date(selectedDate);
+
+            // Subtract days for Prepaid (20 days before)
+            let prepaidDate = new Date(date);
+            prepaidDate.setDate(prepaidDate.getDate() - 20);
+
+            // Subtract days for MBB (31 days before)
+            let mbbDate = new Date(date);
+            mbbDate.setDate(mbbDate.getDate() - 31);
+
+            // Format the date as "DD Month YYYY"
+            let options = { day: '2-digit', month: 'long', year: 'numeric' };
+            let prepaidFormatted = prepaidDate.toLocaleDateString('en-GB', options);
+            let mbbFormatted = mbbDate.toLocaleDateString('en-GB', options);
+
+            document.getElementById('prepaidResult').innerText = "Prepaid Open Date: " + prepaidFormatted;
+            document.getElementById('mbbResult').innerText = "MBB Open Date: " + mbbFormatted;
+        }
+
+        // Function to add a plus sign to the input
+        function addPlus() {
+            let input = document.getElementById('RevenueInput');
+            input.value = input.value.trim() + '+';
+        }
+    </script>
+
+</body>
+</html>
